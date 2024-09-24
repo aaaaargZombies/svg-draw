@@ -14,17 +14,6 @@ import Svg.Attributes exposing (cx, cy, r, rx, ry, viewBox, x, y)
 import Task
 
 
-{-| I wanted to make a circle drawing thing using partial application
-
-I'd need a function that takes a Vec for the position and a radius.
-
-I'd partially apply the Vec on mouseDown, adding the radius as a delta on mouse~move
-
-Then adding the finnished Circle to the model on mouseUp
-
-BUT I'm haveing some bother with the SVG because if I make it fill the whole screen than the pixel X,Y will be missmatched to the SVG scale
-
--}
 type alias Model =
     { width : Int
     , height : Int

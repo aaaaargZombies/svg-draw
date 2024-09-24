@@ -29,7 +29,7 @@ type alias Model =
     { width : Int
     , height : Int
     , drawing : Maybe Shape
-    , tool : Shape -- should this be (Vec2 -> Shape)
+    , tool : Vec2 -> Shape
     , shapes : List Shape
     }
 
@@ -39,7 +39,7 @@ initialModel =
     { width = 1000
     , height = 800
     , drawing = Nothing
-    , tool = Circle (vec2 0 0) (vec2 0 0)
+    , tool = Circle (vec2 0 0)
     , shapes = []
     }
 
@@ -77,16 +77,16 @@ update msg model =
 
         StartDraw vec ->
             let
-                draw =
-                    case model.tool of
-                        Rectangle _ _ ->
-                            Just (Circle vec vec)
-
-                        Circle _ _ ->
-                            Just (Rectangle vec vec)
-
                 tool =
-                    Maybe.withDefault (Circle (vec2 0 0) (vec2 0 0)) draw
+                    case model.tool vec of
+                        Circle _ _ ->
+                            Circle vec
+
+                        Rectangle _ _ ->
+                            Rectangle vec
+
+                draw =
+                    Just <| tool vec
             in
             ( { model | drawing = draw, tool = tool }, Cmd.none )
 
@@ -95,13 +95,8 @@ update msg model =
                 drawing =
                     model.drawing
                         |> Maybe.map
-                            (\shape ->
-                                case shape of
-                                    Circle startVev _ ->
-                                        Circle startVev vec
-
-                                    Rectangle startVev _ ->
-                                        Rectangle startVev vec
+                            (\_ ->
+                                model.tool vec
                             )
             in
             ( { model | drawing = drawing }, Cmd.none )

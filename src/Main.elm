@@ -207,7 +207,7 @@ view model =
                         ]
                     , onClick (SelectTool <| Circle <| vec2 0 0)
                     ]
-                    [ Html.text "square" ]
+                    [ Html.text "Circle" ]
                 ]
             ]
         ]

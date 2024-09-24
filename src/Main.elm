@@ -29,14 +29,9 @@ type alias Model =
     { width : Int
     , height : Int
     , drawing : Maybe Shape
-    , tool : Shape
+    , tool : Shape -- should this be (Vec2 -> Shape)
     , shapes : List Shape
     }
-
-
-type Shape
-    = Circle Vec2 Vec2
-    | Rectangle Vec2 Vec2
 
 
 initialModel : Model
@@ -59,7 +54,7 @@ type Msg
     | GotViewport Viewport
     | StartDraw Vec2
     | Draw Vec2
-    | StopDraw
+    | FinishDraw
     | LogValue Value
 
 
@@ -107,13 +102,11 @@ update msg model =
 
                                     Rectangle startVev _ ->
                                         Rectangle startVev vec
-                             -- _ ->
-                             --     shape
                             )
             in
             ( { model | drawing = drawing }, Cmd.none )
 
-        StopDraw ->
+        FinishDraw ->
             let
                 shapes =
                     model.drawing
@@ -124,6 +117,11 @@ update msg model =
 
         GotViewport viewport ->
             ( { model | width = viewport.viewport.width |> floor, height = viewport.viewport.height |> floor }, Cmd.none )
+
+
+type Shape
+    = Circle Vec2 Vec2
+    | Rectangle Vec2 Vec2
 
 
 toSvg : Shape -> Svg.Svg msg
@@ -176,10 +174,6 @@ toSvg shape =
                 , ry "5"
                 ]
                 []
-
-
-
--- _ -> Svg.text ""
 
 
 view : Model -> Html Msg
@@ -245,21 +239,13 @@ drawDecoder =
         |> Json.Decode.map Draw
 
 
-logDecoder : Json.Decode.Decoder Msg
-logDecoder =
-    Json.Decode.value |> Json.Decode.map LogValue
-
-
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Browser.Events.onMouseDown <| startDecoder
-        , Browser.Events.onMouseUp <| Json.Decode.succeed StopDraw
+        , Browser.Events.onMouseUp <| Json.Decode.succeed FinishDraw
         , Browser.Events.onMouseMove <| drawDecoder
         ]
-
-
-port logPort : Value -> Cmd msg
 
 
 main : Program () Model Msg
@@ -270,3 +256,11 @@ main =
         , update = update
         , subscriptions = subscriptions
         }
+
+
+logDecoder : Json.Decode.Decoder Msg
+logDecoder =
+    Json.Decode.value |> Json.Decode.map LogValue
+
+
+port logPort : Value -> Cmd msg

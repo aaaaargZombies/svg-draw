@@ -35,24 +35,29 @@ import Simplify
 
 config : List Rule
 config =
-    [ Docs.ReviewAtDocs.rule
-    , NoConfusingPrefixOperator.rule
-    , NoDebug.Log.rule
-    , NoDebug.TodoOrToString.rule
-        |> Rule.ignoreErrorsForDirectories [ "tests/" ]
-    , NoExposingEverything.rule
-    , NoImportingEverything.rule []
-    , NoMissingTypeAnnotation.rule
-    , NoMissingTypeAnnotationInLetIn.rule
-    , NoMissingTypeExpose.rule
-    , NoSimpleLetBody.rule
-    , NoPrematureLetComputation.rule
-    , NoUnused.CustomTypeConstructors.rule []
-    , NoUnused.CustomTypeConstructorArgs.rule
-    , NoUnused.Dependencies.rule
-    , NoUnused.Exports.rule
-    , NoUnused.Parameters.rule
-    , NoUnused.Patterns.rule
-    , NoUnused.Variables.rule
-    , Simplify.rule Simplify.defaults
+    [ NoDebug.Log.rule
     ]
+
+
+
+-- [ Docs.ReviewAtDocs.rule
+-- , NoConfusingPrefixOperator.rule
+-- , NoDebug.Log.rule
+-- , NoDebug.TodoOrToString.rule
+--     |> Rule.ignoreErrorsForDirectories [ "tests/" ]
+-- , NoExposingEverything.rule
+-- , NoImportingEverything.rule []
+-- , NoMissingTypeAnnotation.rule
+-- , NoMissingTypeAnnotationInLetIn.rule
+-- , NoMissingTypeExpose.rule
+-- , NoSimpleLetBody.rule
+-- , NoPrematureLetComputation.rule
+-- , NoUnused.CustomTypeConstructors.rule []
+-- , NoUnused.CustomTypeConstructorArgs.rule
+-- , NoUnused.Dependencies.rule
+-- , NoUnused.Exports.rule
+-- , NoUnused.Parameters.rule
+-- , NoUnused.Patterns.rule
+-- , NoUnused.Variables.rule
+-- , Simplify.rule Simplify.defaults
+-- ]

@@ -7,7 +7,8 @@ import Html exposing (Html, button, div, main_, text)
 import Html.Attributes exposing (height, style, width)
 import Html.Events exposing (onClick)
 import Json.Decode exposing (Value)
-import String exposing (fromInt)
+import Math.Vector2 exposing (Vec2, vec2)
+import String exposing (fromFloat, fromInt)
 import Svg exposing (circle, rect, svg)
 import Svg.Attributes exposing (cx, cy, r, rx, ry, viewBox, x, y)
 import Task
@@ -34,8 +35,8 @@ type alias Model =
 
 
 type Shape
-    = Circle Int Int Int
-    | Rectangle Int Int Int Int
+    = Circle Vec2 Vec2
+    | Rectangle Vec2 Vec2
 
 
 initialModel : Model
@@ -43,7 +44,7 @@ initialModel =
     { width = 1000
     , height = 800
     , drawing = Nothing
-    , tool = Circle 0 0 0
+    , tool = Circle (vec2 0 0) (vec2 0 0)
     , shapes = []
     }
 
@@ -56,8 +57,8 @@ init _ =
 type Msg
     = NoOp
     | GotViewport Viewport
-    | StartDraw Int Int
-    | Draw Int Int
+    | StartDraw Vec2
+    | Draw Vec2
     | StopDraw
     | LogValue Value
 
@@ -79,51 +80,33 @@ update msg model =
             else
                 ( model, Cmd.none )
 
-        StartDraw x y ->
+        StartDraw vec ->
             let
                 draw =
                     case model.tool of
-                        Rectangle _ _ _ _ ->
-                            Just (Circle x y 0)
+                        Rectangle _ _ ->
+                            Just (Circle vec vec)
 
-                        Circle _ _ _ ->
-                            Just (Rectangle x y x y)
+                        Circle _ _ ->
+                            Just (Rectangle vec vec)
 
                 tool =
-                    case model.tool of
-                        Rectangle _ _ _ _ ->
-                            Circle x y 0
-
-                        Circle _ _ _ ->
-                            Rectangle x y 0 0
+                    Maybe.withDefault (Circle (vec2 0 0) (vec2 0 0)) draw
             in
             ( { model | drawing = draw, tool = tool }, Cmd.none )
 
-        Draw x y ->
+        Draw vec ->
             let
                 drawing =
                     model.drawing
                         |> Maybe.map
                             (\shape ->
                                 case shape of
-                                    Circle x_ y_ _ ->
-                                        let
-                                            xDelta =
-                                                x - x_
+                                    Circle startVev _ ->
+                                        Circle startVev vec
 
-                                            yDelta =
-                                                y - y_
-
-                                            delta =
-                                                ((xDelta ^ 2) + (yDelta ^ 2))
-                                                    |> toFloat
-                                                    |> sqrt
-                                                    |> floor
-                                        in
-                                        Circle x_ y_ delta
-
-                                    Rectangle x_ y_ _ _ ->
-                                        Rectangle x_ y_ x y
+                                    Rectangle startVev _ ->
+                                        Rectangle startVev vec
                              -- _ ->
                              --     shape
                             )
@@ -146,47 +129,47 @@ update msg model =
 toSvg : Shape -> Svg.Svg msg
 toSvg shape =
     case shape of
-        Circle x y radius ->
+        Circle start end ->
             let
-                x_ =
-                    fromInt x
+                x =
+                    start |> Math.Vector2.getX |> fromFloat
 
-                y_ =
-                    fromInt y
+                y =
+                    start |> Math.Vector2.getY |> fromFloat
 
                 r_ =
-                    fromInt radius
+                    Math.Vector2.distance start end |> fromFloat
             in
             circle
-                [ cx x_
-                , cy y_
+                [ cx x
+                , cy y
                 , r r_
                 ]
                 []
 
-        Rectangle x__ y__ x_ y_ ->
+        Rectangle start end ->
             let
                 xStart =
-                    min x__ x_
+                    min (Math.Vector2.getX start) (Math.Vector2.getX end)
 
                 yStart =
-                    min y__ y_
+                    min (Math.Vector2.getY start) (Math.Vector2.getY end)
 
                 xEnd =
-                    max x__ x_
+                    max (Math.Vector2.getX start) (Math.Vector2.getX end)
 
                 yEnd =
-                    max y__ y_
+                    max (Math.Vector2.getY start) (Math.Vector2.getY end)
 
                 width_ =
-                    xEnd - xStart
+                    xEnd - xStart |> floor
 
                 height_ =
-                    yEnd - yStart
+                    yEnd - yStart |> floor
             in
             rect
-                [ x <| fromInt xStart
-                , y <| fromInt yStart
+                [ x <| fromFloat xStart
+                , y <| fromFloat yStart
                 , width width_
                 , height height_
                 , rx "5"
@@ -248,16 +231,18 @@ view model =
 
 startDecoder : Json.Decode.Decoder Msg
 startDecoder =
-    Json.Decode.map2 StartDraw
-        (Json.Decode.field "pageX" Json.Decode.float |> Json.Decode.map truncate)
-        (Json.Decode.field "pageY" Json.Decode.float |> Json.Decode.map truncate)
+    Json.Decode.map2 vec2
+        (Json.Decode.field "pageX" Json.Decode.float)
+        (Json.Decode.field "pageY" Json.Decode.float)
+        |> Json.Decode.map StartDraw
 
 
 drawDecoder : Json.Decode.Decoder Msg
 drawDecoder =
-    Json.Decode.map2 Draw
-        (Json.Decode.field "pageX" Json.Decode.float |> Json.Decode.map truncate)
-        (Json.Decode.field "pageY" Json.Decode.float |> Json.Decode.map truncate)
+    Json.Decode.map2 vec2
+        (Json.Decode.field "pageX" Json.Decode.float)
+        (Json.Decode.field "pageY" Json.Decode.float)
+        |> Json.Decode.map Draw
 
 
 logDecoder : Json.Decode.Decoder Msg

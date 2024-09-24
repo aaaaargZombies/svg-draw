@@ -87,7 +87,7 @@ update msg model =
                             Just (Circle x y 0)
 
                         Circle _ _ _ ->
-                            Just (Rectangle x y 0 0)
+                            Just (Rectangle x y x y)
 
                 tool =
                     case model.tool of
@@ -123,20 +123,7 @@ update msg model =
                                         Circle x_ y_ delta
 
                                     Rectangle x_ y_ _ _ ->
-                                        let
-                                            xDelta =
-                                                x - x_ |> abs
-
-                                            yDelta =
-                                                y - y_ |> abs
-
-                                            posX =
-                                                min x x_
-
-                                            posY =
-                                                min y y_
-                                        in
-                                        Rectangle posX posY xDelta yDelta
+                                        Rectangle x_ y_ x y
                              -- _ ->
                              --     shape
                             )
@@ -177,10 +164,29 @@ toSvg shape =
                 ]
                 []
 
-        Rectangle x_ y_ width_ height_ ->
+        Rectangle x__ y__ x_ y_ ->
+            let
+                xStart =
+                    min x__ x_
+
+                yStart =
+                    min y__ y_
+
+                xEnd =
+                    max x__ x_
+
+                yEnd =
+                    max y__ y_
+
+                width_ =
+                    xEnd - xStart
+
+                height_ =
+                    yEnd - yStart
+            in
             rect
-                [ x <| fromInt x_
-                , y <| fromInt y_
+                [ x <| fromInt xStart
+                , y <| fromInt yStart
                 , width width_
                 , height height_
                 , rx "5"

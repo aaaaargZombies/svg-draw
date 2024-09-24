@@ -3,8 +3,8 @@ port module Main exposing (main)
 import Browser
 import Browser.Dom exposing (Viewport)
 import Browser.Events
-import Html exposing (Html, button, div, main_, text)
-import Html.Attributes exposing (height, style, width)
+import Html exposing (Html, button, div, main_, text, ul)
+import Html.Attributes exposing (classList, height, style, width)
 import Html.Events exposing (onClick)
 import Json.Decode exposing (Value)
 import Math.Vector2 exposing (Vec2, vec2)
@@ -46,6 +46,7 @@ type Msg
     | Draw Vec2
     | FinishDraw
     | LogValue Value
+    | SelectTool (Vec2 -> Shape)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -64,6 +65,9 @@ update msg model =
 
             else
                 ( model, Cmd.none )
+
+        GotViewport viewport ->
+            ( { model | width = viewport.viewport.width |> floor, height = viewport.viewport.height |> floor }, Cmd.none )
 
         StartDraw vec ->
             let
@@ -100,8 +104,8 @@ update msg model =
             in
             ( { model | drawing = Nothing, shapes = shapes }, Cmd.none )
 
-        GotViewport viewport ->
-            ( { model | width = viewport.viewport.width |> floor, height = viewport.viewport.height |> floor }, Cmd.none )
+        SelectTool tool ->
+            ( { model | tool = tool }, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -129,6 +133,7 @@ view model =
         , style "display" "flex"
         , style "align-itens" "center"
         , style "justify-content" "center"
+        , style "position" "relative"
         ]
         [ svg
             [ style "height" "100%"
@@ -145,9 +150,66 @@ view model =
                 ]
                 []
                 :: (shapes
-                        |> List.map toSvg
+                        |> List.map Shape.toSvg
                    )
             )
+        , ul
+            [ style "position" "absolute"
+            , style "left" "20px"
+            , style "bottom" "20px"
+            , style "display" "flex"
+            ]
+            [ Html.li []
+                [ Html.button
+                    [ classList
+                        [ ( "text-white", True )
+                        , ( "bg-gray-800", True )
+                        , ( "hover:bg-gray-900", True )
+                        , ( "focus:outline-none", True )
+                        , ( "focus:ring-4", True )
+                        , ( "focus:ring-gray-300", True )
+                        , ( "font-medium", True )
+                        , ( "rounded-lg", True )
+                        , ( "text-sm", True )
+                        , ( "px-5", True )
+                        , ( "py-2.5", True )
+                        , ( "me-2", True )
+                        , ( "mb-2", True )
+                        , ( "dark:bg-gray-800", True )
+                        , ( "dark:hover:bg-gray-700", True )
+                        , ( "dark:focus:ring-gray-700", True )
+                        , ( "dark:border-gray-700", True )
+                        ]
+                    , onClick (SelectTool <| Rectangle <| vec2 0 0)
+                    ]
+                    [ Html.text "Rectangle" ]
+                ]
+            , Html.li []
+                [ Html.button
+                    [ classList
+                        [ ( "text-white", True )
+                        , ( "bg-gray-800", True )
+                        , ( "hover:bg-gray-900", True )
+                        , ( "focus:outline-none", True )
+                        , ( "focus:ring-4", True )
+                        , ( "focus:ring-gray-300", True )
+                        , ( "font-medium", True )
+                        , ( "rounded-lg", True )
+                        , ( "text-sm", True )
+                        , ( "px-5", True )
+                        , ( "py-2.5", True )
+                        , ( "me-2", True )
+                        , ( "mb-2", True )
+                        , ( "dark:bg-gray-800", True )
+                        , ( "dark:hover:bg-gray-700", True )
+                        , ( "dark:focus:ring-gray-700", True )
+                        , ( "dark:border-gray-700", True )
+                        ]
+                    , onClick (SelectTool <| Circle <| vec2 0 0)
+                    ]
+                    [ Html.text "square" ]
+                ]
+            ]
         ]
 
 

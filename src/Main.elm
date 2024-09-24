@@ -47,6 +47,7 @@ type Msg
     | FinishDraw
     | LogValue Value
     | SelectTool (Vec2 -> Shape)
+    | Undo
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -56,15 +57,7 @@ update msg model =
             ( model, Cmd.none )
 
         LogValue val ->
-            let
-                drawing =
-                    model.drawing |> Maybe.map (always True) |> Maybe.withDefault False
-            in
-            if drawing then
-                ( model, logPort val )
-
-            else
-                ( model, Cmd.none )
+            ( model, logPort val )
 
         GotViewport viewport ->
             ( { model | width = viewport.viewport.width |> floor, height = viewport.viewport.height |> floor }, Cmd.none )
@@ -106,6 +99,13 @@ update msg model =
 
         SelectTool tool ->
             ( { model | tool = tool }, Cmd.none )
+
+        Undo ->
+            let
+                shapes =
+                    model.shapes |> List.tail |> Maybe.withDefault []
+            in
+            ( { model | drawing = Nothing, shapes = shapes }, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -229,12 +229,27 @@ drawDecoder =
         |> Json.Decode.map Draw
 
 
+keyDecoder : Json.Decode.Decoder Msg
+keyDecoder =
+    Json.Decode.field "key" Json.Decode.string
+        |> Json.Decode.map
+            (\key ->
+                case key of
+                    "z" ->
+                        Undo
+
+                    _ ->
+                        NoOp
+            )
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Browser.Events.onMouseDown <| startDecoder
         , Browser.Events.onMouseUp <| Json.Decode.succeed FinishDraw
         , Browser.Events.onMouseMove <| drawDecoder
+        , Browser.Events.onKeyDown <| keyDecoder
         ]
 
 

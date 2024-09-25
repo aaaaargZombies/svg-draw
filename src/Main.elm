@@ -16,8 +16,8 @@ import Task
 
 
 type alias Model =
-    { width : Int
-    , height : Int
+    { width : Float
+    , height : Float
     , drawing : Maybe Shape
     , tool : Vec2 -> Shape
     , shapes : List Shape
@@ -60,7 +60,7 @@ update msg model =
             ( model, logPort val )
 
         GotViewport viewport ->
-            ( { model | width = viewport.viewport.width |> floor, height = viewport.viewport.height |> floor }, Cmd.none )
+            ( { model | width = viewport.viewport.width, height = viewport.viewport.height }, Cmd.none )
 
         StartDraw vec ->
             let
@@ -114,11 +114,11 @@ view model =
         svgViewBox =
             "0 0 "
                 ++ (model.width
-                        |> fromInt
+                        |> String.fromFloat
                    )
                 ++ " "
                 ++ (model.height
-                        |> fromInt
+                        |> String.fromFloat
                    )
 
         shapes =
@@ -244,7 +244,7 @@ keyDecoder =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions model =
+subscriptions _ =
     Sub.batch
         [ Browser.Events.onMouseDown <| startDecoder
         , Browser.Events.onMouseUp <| Json.Decode.succeed FinishDraw

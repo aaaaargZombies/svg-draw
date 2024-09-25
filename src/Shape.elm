@@ -1,9 +1,9 @@
 module Shape exposing (..)
 
-import Math.Vector2 exposing (Vec2, vec2)
-import String exposing (fromFloat, fromInt)
-import Svg exposing (circle, rect, svg)
-import Svg.Attributes exposing (cx, cy, height, r, rx, ry, width, x, y)
+import Math.Vector2 exposing (Vec2)
+import String
+import Svg exposing (Svg)
+import Svg.Attributes
 
 
 type Shape
@@ -11,24 +11,24 @@ type Shape
     | Rectangle Vec2 Vec2
 
 
-toSvg : Shape -> Svg.Svg msg
+toSvg : Shape -> Svg msg
 toSvg shape =
     case shape of
         Circle start end ->
             let
                 x =
-                    start |> Math.Vector2.getX |> fromFloat
+                    start |> Math.Vector2.getX |> String.fromFloat
 
                 y =
-                    start |> Math.Vector2.getY |> fromFloat
+                    start |> Math.Vector2.getY |> String.fromFloat
 
                 r_ =
-                    Math.Vector2.distance start end |> fromFloat
+                    Math.Vector2.distance start end |> String.fromFloat
             in
-            circle
-                [ cx x
-                , cy y
-                , r r_
+            Svg.circle
+                [ Svg.Attributes.cx x
+                , Svg.Attributes.cy y
+                , Svg.Attributes.r r_
                 ]
                 []
 
@@ -47,17 +47,17 @@ toSvg shape =
                     max (Math.Vector2.getY start) (Math.Vector2.getY end)
 
                 width_ =
-                    xEnd - xStart |> fromFloat
+                    xEnd - xStart |> String.fromFloat
 
                 height_ =
-                    yEnd - yStart |> fromFloat
+                    yEnd - yStart |> String.fromFloat
             in
-            rect
-                [ x <| fromFloat xStart
-                , y <| fromFloat yStart
-                , width width_
-                , height height_
-                , rx "5"
-                , ry "5"
+            Svg.rect
+                [ Svg.Attributes.x <| String.fromFloat xStart
+                , Svg.Attributes.y <| String.fromFloat yStart
+                , Svg.Attributes.width width_
+                , Svg.Attributes.height height_
+                , Svg.Attributes.rx "5"
+                , Svg.Attributes.ry "5"
                 ]
                 []

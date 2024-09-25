@@ -126,38 +126,29 @@ view model =
                 |> Maybe.map (\shape -> shape :: model.shapes)
                 |> Maybe.withDefault model.shapes
     in
-    main_
-        [ style "height" "100vh"
-        , style "width" "100vw"
-        , style "background" "pink"
-        , style "display" "flex"
-        , style "align-itens" "center"
-        , style "justify-content" "center"
-        , style "position" "relative"
-        ]
-        [ svg
-            [ style "height" "100%"
-            , style "width" "100%"
-            , viewBox svgViewBox
+    Html.main_
+        [ Html.Attributes.classList
+            [ ( "flex", True )
+            , ( "h-screen", True )
+            , ( "w-screen", True )
+            , ( "bg-pink-200", True )
             ]
-            (rect
-                [ x "10"
-                , y "10"
-                , width 100
-                , height 100
-                , rx "5"
-                , ry "5"
-                ]
-                []
-                :: (shapes
-                        |> List.map Shape.toSvg
-                   )
+        ]
+        [ Svg.svg
+            [ Svg.Attributes.class "h-screen"
+            , Svg.Attributes.class "w-screen"
+            , Svg.Attributes.viewBox svgViewBox
+            ]
+            (shapes
+                |> List.map Shape.toSvg
             )
-        , ul
-            [ style "position" "absolute"
-            , style "left" "20px"
-            , style "bottom" "20px"
-            , style "display" "flex"
+        , Html.ul
+            [ Html.Attributes.classList
+                [ ( "flex", True )
+                , ( "absolute", True )
+                , ( "bottom-5", True )
+                , ( "left-5", True )
+                ]
             ]
             [ Html.li []
                 [ Html.button
@@ -237,6 +228,12 @@ keyDecoder =
                 case key of
                     "z" ->
                         Undo
+
+                    "r" ->
+                        SelectTool <| Rectangle <| vec2 0 0
+
+                    "c" ->
+                        SelectTool <| Circle <| vec2 0 0
 
                     _ ->
                         NoOp

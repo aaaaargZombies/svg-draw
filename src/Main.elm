@@ -3,15 +3,15 @@ port module Main exposing (main)
 import Browser
 import Browser.Dom exposing (Viewport)
 import Browser.Events
-import Html exposing (Html, button, div, main_, text, ul)
-import Html.Attributes exposing (classList, height, style, width)
+import Html exposing (Html)
+import Html.Attributes
 import Html.Events exposing (onClick)
 import Json.Decode exposing (Value)
 import Math.Vector2 exposing (Vec2, vec2)
 import Shape exposing (Shape(..))
-import String exposing (fromFloat, fromInt)
-import Svg exposing (circle, rect, svg)
-import Svg.Attributes exposing (cx, cy, r, rx, ry, viewBox, x, y)
+import String
+import Svg
+import Svg.Attributes
 import Task
 
 
@@ -161,7 +161,7 @@ view model =
             ]
             [ Html.li []
                 [ Html.button
-                    [ classList
+                    [ Html.Attributes.classList
                         [ ( "text-white", True )
                         , ( "bg-gray-800", True )
                         , ( "hover:bg-gray-900", True )
@@ -186,7 +186,7 @@ view model =
                 ]
             , Html.li []
                 [ Html.button
-                    [ classList
+                    [ Html.Attributes.classList
                         [ ( "text-white", True )
                         , ( "bg-gray-800", True )
                         , ( "hover:bg-gray-900", True )

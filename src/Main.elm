@@ -48,6 +48,7 @@ type Msg
     | LogValue Value
     | SelectTool (Vec2 -> Shape)
     | Undo
+    | Reset
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -106,6 +107,9 @@ update msg model =
                     model.shapes |> List.tail |> Maybe.withDefault []
             in
             ( { model | drawing = Nothing, shapes = shapes }, Cmd.none )
+
+        Reset ->
+            ( initialModel, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -228,6 +232,9 @@ keyDecoder =
                 case key of
                     "z" ->
                         Undo
+
+                    "R" ->
+                        Reset
 
                     "r" ->
                         SelectTool <| Rectangle <| vec2 0 0

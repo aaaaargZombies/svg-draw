@@ -34,11 +34,11 @@ app.ports.printPort.subscribe(async (_msg) => {
   const styleNode = document.createElement("style");
   styleNode.innerHTML = styles;
 
-  const serializer = new XMLSerializer();
-  const svg = document.querySelector("#SVG");
-
+  // must clone node or it will be modifying the view that Elm owns and everything goes out of sync
+  const svg = document.querySelector("#SVG").cloneNode(true);
   svg.prepend(styleNode);
 
+  const serializer = new XMLSerializer();
   const serializedSvg = serializer.serializeToString(svg);
 
   const link = document.createElement("a");
@@ -46,10 +46,8 @@ app.ports.printPort.subscribe(async (_msg) => {
     "data:image/svg+xml;charset=utf-8," + encodeURIComponent(serializedSvg);
 
   link.href = url;
-  link.download = "doogle.svg";
+  link.download = "doodle.svg";
   document.body.append(link);
   link.click();
   link.remove();
-
-  // navigates and wrecks elm 😭
 });

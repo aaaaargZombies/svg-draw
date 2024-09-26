@@ -223,6 +223,9 @@ keyDecoder =
                     "c" ->
                         SelectTool <| Circle <| vec2 0 0
 
+                    "p" ->
+                        Print
+
                     _ ->
                         NoOp
             )

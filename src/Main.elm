@@ -111,7 +111,7 @@ update msg model =
             ( { model | drawing = Nothing, shapes = shapes }, Cmd.none )
 
         Reset ->
-            ( initialModel, Cmd.none )
+            ( { model | drawing = Nothing, shapes = [] }, Cmd.none )
 
         Print ->
             ( model, printPort () )

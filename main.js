@@ -40,6 +40,16 @@ app.ports.printPort.subscribe(async (_msg) => {
   svg.prepend(styleNode);
 
   const serializedSvg = serializer.serializeToString(svg);
-  // prep to save to file
-  console.log(serializedSvg);
+
+  const link = document.createElement("a");
+  const url =
+    "data:image/svg+xml;charset=utf-8," + encodeURIComponent(serializedSvg);
+
+  link.href = url;
+  link.download = "doogle.svg";
+  document.body.append(link);
+  link.click();
+  document.body.remove(link);
+
+  // navigates and wrecks elm 😭
 });

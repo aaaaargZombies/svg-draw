@@ -12,6 +12,7 @@ import Shape exposing (Shape(..))
 import String
 import Svg
 import Svg.Attributes
+import TW.Html
 import Task
 
 
@@ -49,6 +50,7 @@ type Msg
     | SelectTool (Vec2 -> Shape)
     | Undo
     | Reset
+    | Print
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -111,9 +113,12 @@ update msg model =
         Reset ->
             ( initialModel, Cmd.none )
 
+        Print ->
+            ( model, printPort () )
 
-view : Model -> Html Msg
-view model =
+
+viewSvg : Model -> Html msg
+viewSvg model =
     let
         svgViewBox =
             "0 0 "
@@ -130,22 +135,30 @@ view model =
                 |> Maybe.map (\shape -> shape :: model.shapes)
                 |> Maybe.withDefault model.shapes
     in
+    Svg.svg
+        [ Svg.Attributes.id "SVG"
+        , Svg.Attributes.viewBox svgViewBox
+
+        -- , Html.Attributes.style "background" "pink"
+        , Svg.Attributes.class "bg-pink-200"
+        ]
+        (shapes
+            |> List.map Shape.toSvg
+        )
+
+
+view : Model -> Html Msg
+view model =
     Html.main_
         [ Html.Attributes.classList
             [ ( "flex", True )
             , ( "h-screen", True )
             , ( "w-screen", True )
-            , ( "bg-pink-200", True )
+
+            -- , ( "bg-pink-200", True )
             ]
         ]
-        [ Svg.svg
-            [ Svg.Attributes.class "h-screen"
-            , Svg.Attributes.class "w-screen"
-            , Svg.Attributes.viewBox svgViewBox
-            ]
-            (shapes
-                |> List.map Shape.toSvg
-            )
+        [ viewSvg model
         , Html.ul
             [ Html.Attributes.classList
                 [ ( "flex", True )
@@ -155,54 +168,22 @@ view model =
                 ]
             ]
             [ Html.li []
-                [ Html.button
-                    [ Html.Attributes.classList
-                        [ ( "text-white", True )
-                        , ( "bg-gray-800", True )
-                        , ( "hover:bg-gray-900", True )
-                        , ( "focus:outline-none", True )
-                        , ( "focus:ring-4", True )
-                        , ( "focus:ring-gray-300", True )
-                        , ( "font-medium", True )
-                        , ( "rounded-lg", True )
-                        , ( "text-sm", True )
-                        , ( "px-5", True )
-                        , ( "py-2.5", True )
-                        , ( "me-2", True )
-                        , ( "mb-2", True )
-                        , ( "dark:bg-gray-800", True )
-                        , ( "dark:hover:bg-gray-700", True )
-                        , ( "dark:focus:ring-gray-700", True )
-                        , ( "dark:border-gray-700", True )
-                        ]
-                    , onClick (SelectTool <| Rectangle <| vec2 0 0)
+                [ TW.Html.button
+                    [ onClick (SelectTool <| Rectangle <| vec2 0 0)
                     ]
                     [ Html.text "Rectangle" ]
                 ]
             , Html.li []
-                [ Html.button
-                    [ Html.Attributes.classList
-                        [ ( "text-white", True )
-                        , ( "bg-gray-800", True )
-                        , ( "hover:bg-gray-900", True )
-                        , ( "focus:outline-none", True )
-                        , ( "focus:ring-4", True )
-                        , ( "focus:ring-gray-300", True )
-                        , ( "font-medium", True )
-                        , ( "rounded-lg", True )
-                        , ( "text-sm", True )
-                        , ( "px-5", True )
-                        , ( "py-2.5", True )
-                        , ( "me-2", True )
-                        , ( "mb-2", True )
-                        , ( "dark:bg-gray-800", True )
-                        , ( "dark:hover:bg-gray-700", True )
-                        , ( "dark:focus:ring-gray-700", True )
-                        , ( "dark:border-gray-700", True )
-                        ]
-                    , onClick (SelectTool <| Circle <| vec2 0 0)
+                [ TW.Html.button
+                    [ onClick (SelectTool <| Circle <| vec2 0 0)
                     ]
                     [ Html.text "Circle" ]
+                ]
+            , Html.li []
+                [ TW.Html.button
+                    [ onClick Print
+                    ]
+                    [ Html.text "Print" ]
                 ]
             ]
         ]
@@ -273,3 +254,6 @@ logDecoder =
 
 
 port logPort : Value -> Cmd msg
+
+
+port printPort : () -> Cmd msg

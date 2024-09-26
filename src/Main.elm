@@ -232,13 +232,16 @@ keyDecoder =
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.batch
+subscriptions { drawing } =
+    Sub.batch <|
         [ Browser.Events.onMouseDown <| startDecoder
         , Browser.Events.onMouseUp <| Json.Decode.succeed FinishDraw
-        , Browser.Events.onMouseMove <| drawDecoder
         , Browser.Events.onKeyDown <| keyDecoder
         ]
+            ++ (drawing
+                    |> Maybe.map (always [ Browser.Events.onMouseMove <| drawDecoder ])
+                    |> Maybe.withDefault []
+               )
 
 
 main : Program () Model Msg

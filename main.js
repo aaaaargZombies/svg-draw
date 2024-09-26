@@ -31,18 +31,15 @@ app.ports.printPort.subscribe(async (_msg) => {
       .catch((_error) => "");
   }
 
-  const meta = `<svg xmlns="http://www.w3.org/2000/svg" `;
+  const styleNode = document.createElement("style");
+  styleNode.innerHTML = styles;
 
-  const svgStyles = `><style>
-			${styles}
-		</style><`;
-  const svg =
-    '<?xml version="1.0" standalone="no"?>\n' +
-    document
-      .querySelector("#SVG")
-      .outerHTML.replace("<svg", meta)
-      .replace("><", svgStyles);
+  const serializer = new XMLSerializer();
+  const svg = document.querySelector("#SVG");
 
+  svg.prepend(styleNode);
+
+  const serializedSvg = serializer.serializeToString(svg);
   // prep to save to file
-  console.log(svg);
+  console.log(serializedSvg);
 });

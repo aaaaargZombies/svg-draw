@@ -75,6 +75,9 @@ update msg model =
                         Rectangle _ _ ->
                             Rectangle vec
 
+                        Square _ _ ->
+                            Square vec
+
                 draw =
                     Just <| tool vec
             in
@@ -175,6 +178,12 @@ view model =
                 ]
             , Html.li []
                 [ TW.Html.button
+                    [ onClick (SelectTool <| Square <| vec2 0 0)
+                    ]
+                    [ Html.text "Square" ]
+                ]
+            , Html.li []
+                [ TW.Html.button
                     [ onClick (SelectTool <| Circle <| vec2 0 0)
                     ]
                     [ Html.text "Circle" ]
@@ -222,6 +231,9 @@ keyDecoder =
 
                     "c" ->
                         SelectTool <| Circle <| vec2 0 0
+
+                    "s" ->
+                        SelectTool <| Square <| vec2 0 0
 
                     "p" ->
                         Print

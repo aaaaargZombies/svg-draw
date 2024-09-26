@@ -17,41 +17,39 @@ app.ports.logPort.subscribe((event) => {
 });
 
 app.ports.printPort.subscribe(async (_msg) => {
-  setTimeout(async () => {
-    // annoying hacky thing because Vite loads the styles differently to get HMR
-    let styles = "";
-    if (process.env.NODE_ENV === "development") {
-      styles = document.querySelector("style").innerHTML;
-    } else {
-      const href = document
-        .querySelector('link[rel="stylesheet"]')
-        .getAttribute("href");
+  // annoying hacky thing because Vite loads the styles differently to get HMR
+  let styles = "";
+  if (process.env.NODE_ENV === "development") {
+    styles = document.querySelector("style").innerHTML;
+  } else {
+    const href = document
+      .querySelector('link[rel="stylesheet"]')
+      .getAttribute("href");
 
-      styles = await fetch(href)
-        .then((res) => res.text())
-        .catch((_error) => "");
-    }
+    styles = await fetch(href)
+      .then((res) => res.text())
+      .catch((_error) => "");
+  }
 
-    const styleNode = document.createElement("style");
-    styleNode.innerHTML = styles;
+  const styleNode = document.createElement("style");
+  styleNode.innerHTML = styles;
 
-    const serializer = new XMLSerializer();
-    const svg = document.querySelector("#SVG");
+  const serializer = new XMLSerializer();
+  const svg = document.querySelector("#SVG");
 
-    svg.prepend(styleNode);
+  svg.prepend(styleNode);
 
-    const serializedSvg = serializer.serializeToString(svg);
+  const serializedSvg = serializer.serializeToString(svg);
 
-    const link = document.createElement("a");
-    const url =
-      "data:image/svg+xml;charset=utf-8," + encodeURIComponent(serializedSvg);
+  const link = document.createElement("a");
+  const url =
+    "data:image/svg+xml;charset=utf-8," + encodeURIComponent(serializedSvg);
 
-    link.href = url;
-    link.download = "doogle.svg";
-    document.body.append(link);
-    link.click();
-    link.remove();
-  }, 0);
+  link.href = url;
+  link.download = "doogle.svg";
+  document.body.append(link);
+  link.click();
+  link.remove();
 
   // navigates and wrecks elm 😭
 });

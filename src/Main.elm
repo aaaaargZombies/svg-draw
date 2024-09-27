@@ -231,7 +231,7 @@ keyDecoder =
                     "s" ->
                         SelectTool <| Square <| vec2 0 0
 
-                    "p" ->
+                    "P" ->
                         Print
 
                     _ ->

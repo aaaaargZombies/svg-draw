@@ -160,9 +160,10 @@ view model =
         [ viewSvg model
         , Html.ul
             [ Html.Attributes.classList
-                [ ( "flex", True )
-                , ( "absolute", True )
+                [ ( "absolute", True )
                 , ( "bottom-5", True )
+                , ( "flex", True )
+                , ( "gap-2", True )
                 , ( "left-5", True )
                 ]
             ]

@@ -70,6 +70,8 @@ toSvg shape =
                 [ Svg.Attributes.cx x
                 , Svg.Attributes.cy y
                 , Svg.Attributes.r r
+                , Svg.Attributes.class "hover:opacity-85"
+                , Svg.Attributes.class "blur-2xl"
                 ]
                 []
 
@@ -85,6 +87,7 @@ toSvg shape =
                 , Svg.Attributes.height <| String.fromFloat d.height
                 , Svg.Attributes.rx "5"
                 , Svg.Attributes.ry "5"
+                , Svg.Attributes.class "animate-pulse"
                 ]
                 []
 

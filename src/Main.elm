@@ -141,8 +141,6 @@ viewSvg model =
     Svg.svg
         [ Svg.Attributes.id "SVG"
         , Svg.Attributes.viewBox svgViewBox
-
-        -- , Html.Attributes.style "background" "pink"
         , Svg.Attributes.class "bg-pink-200"
         ]
         (shapes
@@ -157,8 +155,6 @@ view model =
             [ ( "flex", True )
             , ( "h-screen", True )
             , ( "w-screen", True )
-
-            -- , ( "bg-pink-200", True )
             ]
         ]
         [ viewSvg model

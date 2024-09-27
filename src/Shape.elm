@@ -1,15 +1,24 @@
 module Shape exposing (..)
 
+import Html.Attributes exposing (start)
 import Math.Vector2 exposing (Vec2)
-import String
+import String exposing (fromFloat)
 import Svg exposing (Svg)
 import Svg.Attributes
+
+
+toTuple : Vec2 -> ( Float, Float )
+toTuple vec =
+    vec
+        |> Math.Vector2.toRecord
+        |> (\{ x, y } -> ( x, y ))
 
 
 type Shape
     = Circle Vec2 Vec2
     | Rectangle Vec2 Vec2
     | Square Vec2 Vec2
+    | Polygon (List Vec2) Vec2
 
 
 type alias Dimensions =
@@ -105,3 +114,19 @@ toSvg shape =
                 , Svg.Attributes.ry "5"
                 ]
                 []
+
+        Polygon vecs next ->
+            let
+                points =
+                    vecs
+                        |> (::) next
+                        |> List.map
+                            (\vec ->
+                                vec
+                                    |> toTuple
+                                    |> Tuple.mapBoth fromFloat fromFloat
+                                    |> (\( x, y ) -> x ++ "," ++ y)
+                            )
+                        |> String.join " "
+            in
+            Svg.polygon [ Svg.Attributes.points points ] []

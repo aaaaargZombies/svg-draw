@@ -78,6 +78,14 @@ update msg model =
                         Square _ _ ->
                             Square vec
 
+                        Polygon _ _ ->
+                            case model.drawing of
+                                Just (Polygon vecs _) ->
+                                    Polygon <| vec :: vecs
+
+                                _ ->
+                                    Polygon [ vec ]
+
                 draw =
                     Just <| tool vec
             in
@@ -96,12 +104,42 @@ update msg model =
 
         FinishDraw ->
             let
-                shapes =
+                drawing =
                     model.drawing
-                        |> Maybe.map (\shape -> shape :: model.shapes)
-                        |> Maybe.withDefault model.shapes
+                        |> Maybe.andThen
+                            (\shape ->
+                                case shape of
+                                    Polygon vecs last ->
+                                        let
+                                            closed =
+                                                vecs
+                                                    |> List.reverse
+                                                    |> List.head
+                                                    |> Maybe.map (\start -> Math.Vector2.distance start last < 20)
+                                                    |> Maybe.withDefault False
+                                        in
+                                        if closed then
+                                            Nothing
+
+                                        else
+                                            -- not working...
+                                            Just <| Polygon (last :: vecs) last
+
+                                    _ ->
+                                        Nothing
+                            )
+
+                shapes =
+                    case drawing of
+                        Nothing ->
+                            model.drawing
+                                |> Maybe.map (\shape -> shape :: model.shapes)
+                                |> Maybe.withDefault model.shapes
+
+                        Just _ ->
+                            model.shapes
             in
-            ( { model | drawing = Nothing, shapes = shapes }, Cmd.none )
+            ( { model | drawing = drawing, shapes = shapes }, Cmd.none )
 
         SelectTool tool ->
             ( { model | tool = tool }, Cmd.none )
@@ -190,6 +228,12 @@ view model =
                 ]
             , Html.li []
                 [ TW.Html.button
+                    [ onClick (SelectTool <| Polygon [])
+                    ]
+                    [ Html.text "Polygon" ]
+                ]
+            , Html.li []
+                [ TW.Html.button
                     [ onClick Print
                     ]
                     [ Html.text "Print" ]
@@ -236,6 +280,9 @@ keyDecoder =
                         SelectTool <| Square <| vec2 0 0
 
                     "p" ->
+                        SelectTool <| Polygon []
+
+                    "P" ->
                         Print
 
                     _ ->
